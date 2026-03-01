@@ -1,0 +1,16 @@
+/* Header Details */
+.header h1 { margin: 0 0 10px 0; }
+.meta { color: #666; font-size: 0.9em; }
+
+/* Stats Dashboard */
+.stats { display: flex; gap: 20px; margin-bottom: 20px; }
+.stat-box { flex: 1; background: white; padding: 15px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.stat-val { font-size: 1.5em; font-weight: bold; font-family: monospace; margin-top: 5px; }
+
+/* Transaction Type Indicators (Dyslexia Support) */
+.type-QUOTE { border-left: 6px solid #2196F3; background-color: #e3f2fd; } /* Blue */
+.type-JOB   { border-left: 6px solid #ff9800; background-color: #fff3e0; } /* Yellow */
+.type-INV   { border-left: 6px solid #4caf50; background-color: #e8f5e9; } /* Green */
+
+/* Specific Table Overrides */
+.type-QUOTE td, .type-JOB td, .type-INV td { border-bottom-color: rgba(0,0,0,0.05); }

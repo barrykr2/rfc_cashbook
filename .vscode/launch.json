@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Listen for Xdebug (Port 9000)",
+            "type": "php",
+            "request": "launch",
+            "port": 9000,
+            "pathMappings": {
+                "/workspaces/rfc_cashbook": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Listen for Xdebug (Port 9003)",
+            "type": "php",
+            "request": "launch",
+            "port": 9003,
+            "pathMappings": {
+                "/workspaces/rfc_cashbook": "${workspaceFolder}"
+            }
+        }
+    ]
+}

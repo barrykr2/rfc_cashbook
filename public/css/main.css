@@ -1,0 +1,31 @@
+body { font-family: sans-serif; padding: 20px; background: #f4f4f9; color: #333; }
+a { text-decoration: none; color: #333; }
+a:hover { text-decoration: underline; }
+
+/* Layout Containers */
+.container { max-width: 1000px; margin: 0 auto; }
+.container-sm { max-width: 600px; margin: 0 auto; }
+
+/* Cards & Panels */
+.card, .header { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+th { background: #eee; }
+
+/* Typography & Utilities */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-muted { color: #888; }
+
+.pill { padding: 4px 8px; border-radius: 12px; color: white; font-size: 0.85em; font-weight: bold; display: inline-block; }
+.money { font-family: monospace; text-align: right; }
+.profit { font-weight: bold; color: green; }
+.loss { font-weight: bold; color: red; }
+
+.back-link { display: inline-block; margin-bottom: 15px; }
+
+/* Buttons */
+.btn-add { background: #333; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; display: inline-block; }
+.btn-add:hover { background: #555; text-decoration: none; }

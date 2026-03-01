@@ -1,0 +1,9 @@
+/* Layout for Login and Setup pages */
+.auth-body {
+    margin-top: 50px;
+}
+
+.login-card {
+    max-width: 400px;
+    margin: 0 auto;
+}
