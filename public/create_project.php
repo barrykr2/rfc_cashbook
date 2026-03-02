@@ -13,17 +13,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'];
     
     // Address Fields
+    $unit = $_POST['site_unit'];
+    $number = $_POST['site_number'];
     $street = $_POST['site_street'];
     $suburb = $_POST['site_suburb'];
+    $state = $_POST['site_state'];
+    $postcode = $_POST['site_postcode'];
 
     // Insert Project Header
     $stmt = $pdo->prepare("
-        INSERT INTO project_headers (customer_id, work_category_id, name, site_street, site_suburb, status)
-        VALUES (?, ?, ?, ?, ?, 'ACTIVE')
+        INSERT INTO project_headers (customer_id, work_category_id, name, site_unit, site_number, site_street, site_suburb, site_state, site_postcode, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE')
     ");
     
     try {
-        $stmt->execute([$customerId, $categoryId, $name, $street, $suburb]);
+        $stmt->execute([$customerId, $categoryId, $name, $unit, $number, $street, $suburb, $state, $postcode]);
         $newId = $pdo->lastInsertId();
         header("Location: project_details.php?id=$newId");
         exit;
@@ -42,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/form.css">
     <link rel="stylesheet" href="css/navbar.css">
+    <link rel="stylesheet" href="css/address.css">
     <style>
         /* Dynamic Color Overrides for Categories */
         <?php foreach ($categories as $cat): ?>
@@ -94,16 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Project Name</label>
             <input type="text" name="name" placeholder="e.g. Backyard Deck, Kitchen Reno" required>
 
-            <label>Site Address</label>
-            <div class="flex gap-10">
-                <div class="flex-1">
-                    <input type="text" name="site_street" placeholder="Street Address" required>
-                </div>
-                <div class="flex-1">
-                    <input type="text" name="site_suburb" placeholder="Suburb" required>
-                </div>
-            </div>
-            <p class="text-muted" style="font-size:0.8em; margin-top:5px;">* Address auto-complete coming soon</p>
+            <?php 
+            $prefix = 'site';
+            $data = []; 
+            include __DIR__ . '/../includes/address_form.php'; 
+            ?>
 
             <button type="submit">Create Project</button>
         </form>

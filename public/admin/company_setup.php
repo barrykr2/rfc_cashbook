@@ -47,6 +47,7 @@ if (!$company) {
     <link rel="stylesheet" href="../css/grid.css">
     <link rel="stylesheet" href="../css/form.css">
     <link rel="stylesheet" href="../css/navbar.css">
+    <link rel="stylesheet" href="../css/address.css">
 </head>
 <body class="container">
     <?php include __DIR__ . '/../../includes/navbar.php'; ?>
@@ -86,35 +87,11 @@ if (!$company) {
             <input type="email" name="email" value="<?= htmlspecialchars($company['email'] ?? '') ?>" placeholder="joe@example.com">
 
             <h3 style="margin-bottom: 0; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Business Address</h3>
-            
-            <div class="flex gap-10">
-                <div style="flex: 1;">
-                    <label>Unit</label>
-                    <input type="text" name="addr_unit" value="<?= htmlspecialchars($company['addr_unit'] ?? '') ?>">
-                </div>
-                <div style="flex: 1;">
-                    <label>Number</label>
-                    <input type="text" name="addr_number" value="<?= htmlspecialchars($company['addr_number'] ?? '') ?>">
-                </div>
-            </div>
-
-            <label>Street</label>
-            <input type="text" name="addr_street" value="<?= htmlspecialchars($company['addr_street'] ?? '') ?>">
-
-            <div class="flex gap-10">
-                <div class="flex-1">
-                    <label>Suburb</label>
-                    <input type="text" name="addr_suburb" value="<?= htmlspecialchars($company['addr_suburb'] ?? '') ?>">
-                </div>
-                <div style="width: 80px;">
-                    <label>State</label>
-                    <input type="text" name="addr_state" value="<?= htmlspecialchars($company['addr_state'] ?? '') ?>">
-                </div>
-                <div style="width: 100px;">
-                    <label>Postcode</label>
-                    <input type="text" name="addr_postcode" value="<?= htmlspecialchars($company['addr_postcode'] ?? '') ?>">
-                </div>
-            </div>
+            <?php 
+            $prefix = 'addr';
+            $data = $company;
+            include __DIR__ . '/../../includes/address_form.php'; 
+            ?>
 
             <button type="submit">Save Details</button>
         </form>

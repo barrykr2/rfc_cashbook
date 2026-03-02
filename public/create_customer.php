@@ -5,16 +5,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $clientName = $_POST['client_name'];
     $contactName = $_POST['contact_name'];
     $email = $_POST['email'];
+    $unit = $_POST['addr_unit'];
+    $number = $_POST['addr_number'];
     $street = $_POST['addr_street'];
     $suburb = $_POST['addr_suburb'];
+    $state = $_POST['addr_state'];
+    $postcode = $_POST['addr_postcode'];
 
     $stmt = $pdo->prepare("
-        INSERT INTO customers (client_name, contact_name, email, addr_street, addr_suburb)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO customers (client_name, contact_name, email, addr_unit, addr_number, addr_street, addr_suburb, addr_state, addr_postcode)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
 
     try {
-        $stmt->execute([$clientName, $contactName, $email, $street, $suburb]);
+        $stmt->execute([$clientName, $contactName, $email, $unit, $number, $street, $suburb, $state, $postcode]);
         // Redirect back to Create Project so they can use the new customer immediately
         header("Location: create_project.php");
         exit;
@@ -32,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/grid.css">
     <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/address.css">
 </head>
 <body class="container-sm">
 
@@ -50,15 +55,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Email</label>
             <input type="text" name="email" placeholder="dave@example.com">
 
-            <label>Address</label>
-            <div class="flex gap-10">
-                <div class="flex-1">
-                    <input type="text" name="addr_street" placeholder="Street Address">
-                </div>
-                <div class="flex-1">
-                    <input type="text" name="addr_suburb" placeholder="Suburb">
-                </div>
-            </div>
+            <?php 
+            $prefix = 'addr';
+            $data = []; // No existing data for new customer
+            include __DIR__ . '/../includes/address_form.php'; 
+            ?>
 
             <button type="submit">Save Customer</button>
         </form>

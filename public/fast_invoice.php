@@ -14,20 +14,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gst = $_POST['gst_amount'];
 
     // 1. Get Customer Address for Site Address default
-    $stmt = $pdo->prepare("SELECT addr_street, addr_suburb FROM customers WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT addr_unit, addr_number, addr_street, addr_suburb, addr_state, addr_postcode FROM customers WHERE id = ?");
     $stmt->execute([$customerId]);
     $cust = $stmt->fetch();
     
+    $siteUnit = $cust['addr_unit'] ?? '';
+    $siteNumber = $cust['addr_number'] ?? '';
     $siteStreet = $cust['addr_street'] ?? '';
     $siteSuburb = $cust['addr_suburb'] ?? '';
+    $siteState = $cust['addr_state'] ?? '';
+    $sitePostcode = $cust['addr_postcode'] ?? '';
 
     // 2. Create Project Header (Ghost Job)
     // Name is derived from description, Status=INVOICED, is_fast_invoice=1
     $stmt = $pdo->prepare("
-        INSERT INTO project_headers (customer_id, work_category_id, name, site_street, site_suburb, status, is_fast_invoice)
-        VALUES (?, ?, ?, ?, ?, 'INVOICED', 1)
+        INSERT INTO project_headers (customer_id, work_category_id, name, site_unit, site_number, site_street, site_suburb, site_state, site_postcode, status, is_fast_invoice)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'INVOICED', 1)
     ");
-    $stmt->execute([$customerId, $categoryId, $description, $siteStreet, $siteSuburb]);
+    $stmt->execute([$customerId, $categoryId, $description, $siteUnit, $siteNumber, $siteStreet, $siteSuburb, $siteState, $sitePostcode]);
     $projectId = $pdo->lastInsertId();
 
     // 3. Create Revenue Line Item (INV)
