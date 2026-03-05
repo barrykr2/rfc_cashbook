@@ -26,7 +26,7 @@ try {
     $stmt->execute(['forbidden_usernames', 'admin,administrator,root,system']);
     
     // API Keys (with a placeholder for Google Maps)
-    $stmt->execute(['google_maps_key', 'AIzaSyC1_umOkPsmJhcaN3AdkHvlWXOTa-Nwd6c']); // Start with an empty key
+    $stmt->execute(['google_maps_key', 'xxxxx']); // Start with an empty key
 
     $pdo->commit();
     echo "Default configuration inserted.\n";
