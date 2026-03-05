@@ -32,11 +32,13 @@ try {
 
     // Account Codes (Simplified Chart of Accounts)
     $codes = [
-        [100, 'Sales/Revenue', 1],
+        [100, 'Sales', 1],
         [300, 'Materials', 1],
         [310, 'Fuel/Travel', 1],
         [320, 'Tools', 1],
-        [330, 'Subcontractors', 0]
+        [330, 'Subcontractors', 0],
+        [400, 'Phone', 1],
+        [500, 'Overheads', 0]
     ];
     $stmt = $pdo->prepare("INSERT OR IGNORE INTO account_codes (id, name, is_gst_default) VALUES (?, ?, ?)");
     foreach ($codes as $code) {
@@ -61,14 +63,14 @@ try {
     // 2. Customers
     // ---------------------------------------------------------
     
-    $stmt = $pdo->prepare("INSERT INTO customers (client_name, contact_name, email, addr_street, addr_suburb) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $pdo->prepare("INSERT INTO customers (client_name, contact_name, email, phone, addr_street, addr_suburb) VALUES (?, ?, ?, ?, ?, ?)");
     
     // Customer A: Corporate
-    $stmt->execute(['BuildCo Pty Ltd', 'Dave', 'dave@buildco.com', '123 Construction Rd', 'BuilderTown']);
+    $stmt->execute(['BuildCo Pty Ltd', 'Dave', 'dave@buildco.com', '02 9999 8888', '123 Construction Rd', 'BuilderTown']);
     $buildCoId = $pdo->lastInsertId();
 
     // Customer B: Residential
-    $stmt->execute(['Mrs. Smith', 'Mary', 'mary@gmail.com', '42 Wallaby Way', 'Sydney']);
+    $stmt->execute(['Mrs. Smith', 'Mary', 'mary@gmail.com', '0411 222 333', '42 Wallaby Way', 'Sydney']);
     $mrsSmithId = $pdo->lastInsertId();
     
     echo " - Customers inserted\n";
@@ -121,16 +123,6 @@ try {
     $stmt->execute([$stdProjectId, $quoteId]);
 
     echo " - Standard Project created (Project ID: $stdProjectId)\n";
-
-    // ---------------------------------------------------------
-    // 5. Security Configuration
-    // ---------------------------------------------------------
-    $stmt = $pdo->prepare("INSERT OR IGNORE INTO app_config (key, value) VALUES (?, ?)");
-    $stmt->execute(['max_login_attempts', '3']);
-    $stmt->execute(['lockout_minutes', '10']);
-    $stmt->execute(['session_timeout_minutes', '10']);
-    
-    echo " - Security config inserted\n";
 
     $pdo->commit();
     echo "Seed data complete.\n";

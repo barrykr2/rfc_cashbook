@@ -51,6 +51,7 @@ CREATE TABLE customers (
     client_name       TEXT NOT NULL COLLATE NOCASE, -- e.g. "BuildCo PTY LTD"
     contact_name      TEXT,                        -- e.g. "Dave"
     email             TEXT,
+    phone             TEXT,
     last_project_date DATE,
     addr_unit         TEXT,
     addr_number       TEXT,
@@ -94,6 +95,8 @@ CREATE TABLE project_headers (
     work_category_id  INTEGER REFERENCES work_categories(id),
     name              TEXT NOT NULL,         -- Project Title
     status            TEXT DEFAULT 'ACTIVE', -- ACTIVE, COMPLETED, INVOICED
+    start_date        DATE,
+    estimated_completion_date DATE,
     is_fast_invoice   BOOLEAN DEFAULT 0,     -- Flag for "Ghost Jobs"
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
     -- Site Address (Where the tools are used)

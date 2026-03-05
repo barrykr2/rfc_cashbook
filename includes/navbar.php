@@ -10,6 +10,7 @@
             <a href="#" class="nav-link">Admin ▼</a>
             <div class="dropdown-content">
                 <a href="/admin/company_setup.php">Company Settings</a>
+                <a href="/admin/clients.php">Clients List</a>
                 <a href="/admin/change_password.php">Change Password</a>
                 <a href="/admin/logout.php" style="color: #d9534f;">Logout</a>
             </div>

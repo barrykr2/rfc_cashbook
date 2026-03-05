@@ -19,6 +19,22 @@ input[value="JOB"]:checked + label { background-color: #fff3e0; border-color: #f
 input[value="INV"]:checked + label { background-color: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
 input[value="QUOTE"]:checked + label { background-color: #e3f2fd; border-color: #2196F3; color: #0d47a1; }
 
+/* Input Actions (Icons inside inputs) */
+.input-with-action { position: relative; }
+.input-with-action .btn-action {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-decoration: none;
+    font-size: 1.2em;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: inherit;
+}
+
 /* Actions */
 button[type="submit"] { margin-top: 20px; padding: 12px 20px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
 button[type="submit"]:hover { background: #555; }

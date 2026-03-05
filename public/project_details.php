@@ -9,7 +9,7 @@ if (!$projectId) {
 
 // 1. Fetch Project Header
 $stmt = $pdo->prepare("
-    SELECT p.*, c.client_name, c.contact_name, c.email, w.name as category_name, w.color_hex
+    SELECT p.*, c.client_name, c.contact_name, c.email, c.phone, w.name as category_name, w.color_hex
     FROM project_headers p
     JOIN customers c ON p.customer_id = c.id
     JOIN work_categories w ON p.work_category_id = w.id
@@ -21,6 +21,26 @@ $project = $stmt->fetch();
 if (!$project) {
     die("Project not found.");
 }
+
+function format_display_date($dateStr) {
+    if (empty($dateStr)) {
+        return 'N/A';
+    }
+    return date('D, j M Y', strtotime($dateStr));
+}
+
+function build_map_query($address) {
+    $mapParts = [];
+    // Don't use unit for map query
+    if (!empty($address['site_number'])) $mapParts[] = $address['site_number'];
+    if (!empty($address['site_street'])) $mapParts[] = $address['site_street'];
+    if (!empty($address['site_suburb'])) $mapParts[] = $address['site_suburb'];
+    if (!empty($address['site_state'])) $mapParts[] = $address['site_state'];
+    if (!empty($address['site_postcode'])) $mapParts[] = $address['site_postcode'];
+    if (empty($mapParts)) return '';
+    return urlencode(implode(' ', $mapParts));
+}
+
 
 // 2. Fetch Line Items
 $stmt = $pdo->prepare("
@@ -72,6 +92,11 @@ $profit = $revenue - $cost;
         .type-JOB   { border-left: 6px solid #ff9800; background-color: #fff3e0; } /* Yellow */
         .type-INV   { border-left: 6px solid #4caf50; background-color: #e8f5e9; } /* Green */
         
+        .action-link {
+            text-decoration: none;
+            font-size: 1.1em;
+            margin-left: 8px;
+        }
         .pill { padding: 4px 8px; border-radius: 12px; color: white; font-size: 0.85em; font-weight: bold; display: inline-block; }
         .back-link { display: inline-block; margin-bottom: 15px; text-decoration: none; color: #333; }
     </style>
@@ -91,6 +116,8 @@ $profit = $revenue - $cost;
             <strong>Client:</strong> <?= htmlspecialchars($project['client_name']) ?> (<?= htmlspecialchars($project['contact_name']) ?>)<br>
             <strong>Site:</strong> <?= htmlspecialchars(trim($project['site_number'] . ' ' . $project['site_street'] . ' ' . $project['site_suburb'])) ?><br>
             <strong>Status:</strong> <?= htmlspecialchars($project['status']) ?>
+            | <strong>Start:</strong> <?= format_display_date($project['start_date']) ?>
+            | <strong>Est. Completion:</strong> <?= format_display_date($project['estimated_completion_date']) ?>
         </div>
     </div>
 

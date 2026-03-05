@@ -18,14 +18,30 @@ function _addr_val($d, $key) {
 $displayString = '';
 if (!empty($d[$p.'_street'])) {
     $parts = [];
-    if (!empty($d[$p.'_unit'])) $parts[] = $d[$p.'_unit'] . '/';
-    if (!empty($d[$p.'_number'])) $parts[] = $d[$p.'_number'];
-    $parts[] = $d[$p.'_street'];
+    $unitAndNumber = [];
+    if (!empty($d[$p.'_unit'])) $unitAndNumber[] = $d[$p.'_unit'];
+    if (!empty($d[$p.'_number'])) $unitAndNumber[] = $d[$p.'_number'];
+    if (!empty($unitAndNumber)) {
+        $parts[] = implode('/', $unitAndNumber);
+    }
+    $parts[] = $d[$p.'_street'] . ',';
     if (!empty($d[$p.'_suburb'])) $parts[] = $d[$p.'_suburb'];
-    if (!empty($d[$p.'_state'])) $parts[] = $d[$p.'_state'];
+    if (!empty($d[$p.'_state'])) $parts[] = $d[$p.'_state'] . ',';
     if (!empty($d[$p.'_postcode'])) $parts[] = $d[$p.'_postcode'];
     $displayString = implode(' ', $parts);
-    $displayString = str_replace('/ ', ' ', $displayString); // Clean up if no unit
+}
+
+// Construct a query string for Google Maps
+$mapQuery = '';
+if (!empty($d[$p.'_street'])) {
+    $mapParts = [];
+    // Don't use unit for map query, it's often not useful
+    if (!empty($d[$p.'_number'])) $mapParts[] = $d[$p.'_number'];
+    if (!empty($d[$p.'_street'])) $mapParts[] = $d[$p.'_street'];
+    if (!empty($d[$p.'_suburb'])) $mapParts[] = $d[$p.'_suburb'];
+    if (!empty($d[$p.'_state'])) $mapParts[] = $d[$p.'_state'];
+    if (!empty($d[$p.'_postcode'])) $mapParts[] = $d[$p.'_postcode'];
+    $mapQuery = urlencode(implode(' ', $mapParts));
 }
 
 // Fetch API Key from database config (requires auth.php to be loaded by parent)
@@ -34,7 +50,10 @@ $googleMapsKey = function_exists('get_config') ? get_config('google_maps_key') :
 <div class="address-component" data-prefix="<?= $p ?>">
     <label>Address Lookup</label>
     <div class="address-wrapper">
-        <input type="text" class="address-search" placeholder="Start typing address..." value="<?= htmlspecialchars($displayString) ?>" data-display-string="<?= htmlspecialchars($displayString) ?>" autocomplete="off">
+        <input type="text" class="address-search" placeholder="Start typing address..." value="<?= htmlspecialchars($displayString) ?>" autocomplete="off">
+        <?php if ($mapQuery): ?>
+            <a href="https://maps.google.com/?q=<?= $mapQuery ?>" target="_blank" class="address-map-link" title="View on Map">🗺️</a>
+        <?php endif; ?>
         <div class="address-results"></div>
     </div>
     

@@ -61,9 +61,7 @@ async function setupAddressComponents() {
                 try {
                     // 3. Fetch specific fields required for the breakdown
                     // Note: 'addressComponents' is essential for your logic
-                    await place.fetchFields({ 
-                        fields: ["addressComponents", "location", "formattedAddress"] 
-                    });
+                    await place.fetchFields({ fields: ["addressComponents", "location"] });
 
                     console.log("Address Debug: Place details fetched", place.addressComponents);
 
@@ -86,9 +84,27 @@ async function setupAddressComponents() {
                         }
                     }
                     
-                    // Reveal manual fields for user verification
-                    const manualPanel = document.getElementById('manual_' + prefix);
-                    if (manualPanel) manualPanel.classList.add('open');
+                    // Reconstruct the display string to ensure it's complete and formatted correctly.
+                    const newParts = [];                    
+                    const unitAndNumber = [];
+                    if (fields.unit.value) unitAndNumber.push(fields.unit.value);
+                    if (fields.number.value) unitAndNumber.push(fields.number.value);
+                    if (unitAndNumber.length > 0) {
+                        newParts.push(unitAndNumber.join('/'));
+                    }
+
+                    if (fields.street.value) newParts.push(fields.street.value + ',');
+                    if (fields.suburb.value) newParts.push(fields.suburb.value);
+                    if (fields.state.value) newParts.push(fields.state.value + ',');
+                    if (fields.postcode.value) newParts.push(fields.postcode.value);
+                    
+                    const newDisplayString = newParts.join(' ');
+                    autocomplete.value = newDisplayString;
+                    console.log(`Address Debug: Set autocomplete value post-selection to "${newDisplayString}"`);
+
+                    // // Reveal manual fields for user verification - Per user request, this is now disabled.
+                    // const manualPanel = document.getElementById('manual_' + prefix);
+                    // if (manualPanel) manualPanel.classList.add('open');
 
                 } catch (error) {
                     console.error("Address Debug: Error during fetchFields", error);
@@ -101,28 +117,22 @@ async function setupAddressComponents() {
             });
 
             // 5. Finalize the Swap
-            // If the original input had a value, show the manual entry fields immediately
-            if (originalInput && originalInput.value.trim() !== '') {
-               const manualPanel = document.getElementById('manual_' + prefix);
-                if (manualPanel) {
-                    manualPanel.classList.add('open');
-                    console.log(`Address Debug: Existing data detected, opening manual fields for ${prefix}`);
-                }
-            }
-            
-            // Replace the dummy input with the live Google Component
-            const displayString = originalInput.dataset.displayString;
-             if (displayString && displayString.trim() !== '') {
-                const manualPanel = document.getElementById('manual_' + prefix);
-                 if (manualPanel) {
-                    manualPanel.classList.add('open');
-                    console.log(`Address Debug: displayString exists, opening manual fields for ${prefix}`);
-                }
-            }
-           
+            const displayString = originalInput.value.trim();
 
+            // Replace the dummy input with the live Google Component
             originalInput.replaceWith(autocomplete);
             console.log(`Address Debug: Autocomplete successfully attached for ${prefix}`);
+
+            // After attaching, if there was a pre-existing value, apply it.
+            if (displayString) {
+                // Set the visible text in the search box.
+                autocomplete.value = displayString;
+                console.log(`Address Debug: Set autocomplete value to "${displayString}"`);
+
+                // // Also expand the manual fields to show the full data. - Per user request, this is now disabled.
+                // const manualPanel = document.getElementById('manual_' + prefix);
+                // if (manualPanel) manualPanel.classList.add('open');
+            }
         });
 
     } catch (err) {

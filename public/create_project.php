@@ -1,11 +1,23 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 
+// Check if we've just created a new customer
+$selectedCustomerId = $_GET['new_customer_id'] ?? null;
+
 // Fetch Customers for dropdown (Later we can make this a search)
 $customers = $pdo->query("SELECT id, client_name FROM customers ORDER BY client_name")->fetchAll();
 
 // Fetch Categories for visual selection
 $categories = $pdo->query("SELECT * FROM work_categories ORDER BY name")->fetchAll();
+
+function parse_date_input($dateStr) {
+    if (empty($dateStr)) return null;
+    // Assumes DD/MM/YYYY format from JS
+    $date = DateTime::createFromFormat('d/m/Y', $dateStr);
+    if ($date) return $date->format('Y-m-d');
+    // Fallback for native YYYY-MM-DD
+    return date('Y-m-d', strtotime($dateStr));
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $customerId = $_POST['customer_id'];
@@ -19,15 +31,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $suburb = $_POST['site_suburb'];
     $state = $_POST['site_state'];
     $postcode = $_POST['site_postcode'];
+    $startDate = parse_date_input($_POST['start_date']);
+    $estDate = parse_date_input($_POST['estimated_completion_date']);
 
     // Insert Project Header
     $stmt = $pdo->prepare("
-        INSERT INTO project_headers (customer_id, work_category_id, name, site_unit, site_number, site_street, site_suburb, site_state, site_postcode, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE')
+        INSERT INTO project_headers (customer_id, work_category_id, name, site_unit, site_number, site_street, site_suburb, site_state, site_postcode, status, start_date, estimated_completion_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'ACTIVE', ?, ?)
     ");
     
     try {
-        $stmt->execute([$customerId, $categoryId, $name, $unit, $number, $street, $suburb, $state, $postcode]);
+        $stmt->execute([$customerId, $categoryId, $name, $unit, $number, $street, $suburb, $state, $postcode, $startDate, $estDate]);
         $newId = $pdo->lastInsertId();
         header("Location: project_details.php?id=$newId");
         exit;
@@ -37,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -59,6 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         input[value="<?= $cat['id'] ?>"] + label {
             border-left: 5px solid <?= $cat['color_hex'] ?>;
         }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
         <?php endforeach; ?>
     </style>
 </head>
@@ -78,10 +95,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select name="customer_id" required class="flex-1">
                     <option value="">-- Choose Customer --</option>
                     <?php foreach ($customers as $c): ?>
-                        <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['client_name']) ?></option>
+                        <option value="<?= $c['id'] ?>" <?= ($c['id'] == $selectedCustomerId) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($c['client_name']) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
-                <a href="create_customer.php" class="btn-add" style="margin-top: 5px;">+ New</a>
+                <a href="create_customer.php?redirect_url=create_project.php" class="btn-add" style="margin-top: 5px;">+ New</a>
             </div>
 
             <label>Work Category</label>
@@ -97,7 +116,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <label>Project Name</label>
-            <input type="text" name="name" placeholder="e.g. Backyard Deck, Kitchen Reno" required>
+            <input type="text" name="name" class="smart-title-case" placeholder="e.g. Backyard Deck, Kitchen Reno" required spellcheck="true">
+
+            <div class="flex gap-10">
+                <div class="flex-1">
+                    <label>Start Date</label>
+                    <input type="text" name="start_date" class="smart-date" placeholder="DD/MM/YYYY">
+                </div>
+                <div class="flex-1">
+                    <label>Est. Completion</label>
+                    <input type="text" name="estimated_completion_date" class="smart-date" placeholder="DD/MM/YYYY">
+                </div>
+            </div>
 
             <?php 
             $prefix = 'site';
@@ -108,6 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Create Project</button>
         </form>
     </div>
+
+    <script src="/js/form_helpers.js"></script>
 
 </body>
 </html>

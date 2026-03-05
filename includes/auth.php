@@ -75,7 +75,9 @@ function validate_password_strength($password) {
 }
 
 function validate_username($username) {
-    $forbidden = ['admin', 'administrator'];
+    // Fetch from config, default to a safe list if not set.
+    $forbidden_str = get_config('forbidden_usernames') ?? 'admin,administrator';
+    $forbidden = array_map('trim', explode(',', strtolower($forbidden_str)));
     return !in_array(strtolower($username), $forbidden);
 }
 

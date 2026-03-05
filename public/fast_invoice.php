@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . '/../includes/auth.php';
 
+// Check if we've just created a new customer
+$selectedCustomerId = $_GET['new_customer_id'] ?? null;
+
 // Fetch Customers
 $customers = $pdo->query("SELECT id, client_name, addr_street, addr_suburb FROM customers ORDER BY client_name")->fetchAll();
 // Fetch Categories
@@ -54,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,10 +102,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <select name="customer_id" required class="flex-1">
                     <option value="">-- Choose Customer --</option>
                     <?php foreach ($customers as $c): ?>
-                        <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['client_name']) ?></option>
+                        <option value="<?= $c['id'] ?>" <?= ($c['id'] == $selectedCustomerId) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($c['client_name']) ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
-                <a href="create_customer.php" class="btn-add" style="margin-top: 5px;">+ New</a>
+                <a href="create_customer.php?redirect_url=fast_invoice.php" class="btn-add" style="margin-top: 5px;">+ New</a>
             </div>
 
             <label>Work Category</label>
@@ -118,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <label>Description (Job Name)</label>
-            <input type="text" name="description" placeholder="e.g. Fix Leaky Tap" required>
+            <input type="text" name="description" class="smart-sentence-case" placeholder="e.g. Fix Leaky Tap" required spellcheck="true">
 
             <div class="flex gap-10">
                 <div class="flex-1">
@@ -134,6 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit" style="background-color: #2196F3;">Create & Invoice</button>
         </form>
     </div>
+
+    <script src="/js/form_helpers.js"></script>
 
 </body>
 </html>

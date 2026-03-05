@@ -20,10 +20,19 @@ if (!$project) {
 $suppliers = $pdo->query("SELECT * FROM suppliers WHERE is_active = 1 ORDER BY name")->fetchAll();
 $accounts = $pdo->query("SELECT * FROM account_codes ORDER BY id")->fetchAll();
 
+function parse_date_input($dateStr) {
+    if (empty($dateStr)) return null;
+    // Assumes DD/MM/YYYY format from JS
+    $date = DateTime::createFromFormat('d/m/Y', $dateStr);
+    if ($date) return $date->format('Y-m-d');
+    // Fallback for native YYYY-MM-DD
+    return date('Y-m-d', strtotime($dateStr));
+}
+
 // Handle Form Submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $type = $_POST['item_type'];
-    $date = $_POST['transaction_date'];
+    $date = parse_date_input($_POST['transaction_date']);
     $desc = $_POST['description'];
     $amount = $_POST['amount'];
     $gst = $_POST['gst_amount'];
@@ -43,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-AU">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -67,6 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         input[value="JOB"]:checked + label { background-color: #fff3e0; border-color: #ff9800; color: #e65100; }
         input[value="INV"]:checked + label { background-color: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
         input[value="QUOTE"]:checked + label { background-color: #e3f2fd; border-color: #2196F3; color: #0d47a1; }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
 
         button { margin-top: 20px; padding: 12px 20px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%; }
         button:hover { background: #555; }
@@ -113,10 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <label>Date</label>
-            <input type="date" name="transaction_date" value="<?= date('Y-m-d') ?>" required>
+            <input type="text" name="transaction_date" class="smart-date" value="<?= date('d/m/Y') ?>" required>
 
             <label>Description</label>
-            <input type="text" name="description" placeholder="e.g. Timber, Labor, Deposit" required>
+            <input type="text" name="description" class="smart-sentence-case" placeholder="e.g. Timber, Labor, Deposit" required spellcheck="true">
 
             <div id="supplier-div">
                 <label>Supplier</label>
@@ -150,5 +162,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="submit">Save Transaction</button>
         </form>
     </div>
+
+    <script src="/js/form_helpers.js"></script>
+
 </body>
 </html>
